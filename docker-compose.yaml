@@ -1,0 +1,10 @@
+services:
+    db:
+        image: mongo:5
+        restart: "no"
+        ports:
+            - 27018:27017
+        environment:
+            MONGODB_DATABASE: biblioteca
+        volumes:
+            - ./mongo:/data/db
