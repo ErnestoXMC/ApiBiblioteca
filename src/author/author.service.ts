@@ -25,7 +25,7 @@ export class AuthorService {
             return createdAuthor;
 
         } catch (error) {
-            if(error.code === 11000){
+            if (error.code === 11000) {
                 throw new BadRequestException("Error al registrar el autor, columnas repetidas")
             } else {
                 console.log(error);
@@ -34,9 +34,9 @@ export class AuthorService {
         }
     }
 
-    async createMany(createAuthorDto: CreateAuthorDto[]){
+    async createMany(createAuthorDto: CreateAuthorDto[]) {
         try {
-            
+
             const createAuthorDtoFilter = createAuthorDto.map(author => {
                 author.name = author.name.toLowerCase().trim();
                 author.email = author.email.toLowerCase().trim();
@@ -47,7 +47,7 @@ export class AuthorService {
             return await this.authorModel.insertMany(createAuthorDtoFilter);
 
         } catch (error) {
-            if(error.code === 11000){
+            if (error.code === 11000) {
                 throw new BadRequestException("Error al insertar varios registros, existen elementos duplicados");
             } else {
                 console.log(error);
@@ -59,19 +59,19 @@ export class AuthorService {
     //* Paginacion con limit, offset y isActive (visualizar activos)
     async findAll(pagination: PaginationDto) {
 
-        const {limit = 10, offset = 0, isActive} = pagination;
+        const { limit = 10, offset = 0, isActive } = pagination;
 
         let filter = {};
 
-        if(isActive === 1 || isActive === 0){
-            filter = {isActive}
+        if (isActive === 1 || isActive === 0) {
+            filter = { isActive }
         }
 
         //* Por Defecto nos trae todos los usuarios, limite de 10 y desde el primer registro
         return await this.authorModel.find(filter)
-                                        .limit(limit)
-                                        .skip(offset)
-                                        .select('-__v -createdAt -updatedAt');
+            .limit(limit)
+            .skip(offset)
+            .select('-__v -createdAt -updatedAt');
     }
 
     async findOne(term: string) {
@@ -79,22 +79,22 @@ export class AuthorService {
         //* Previa a una consulta validar la longitud del termino
         const longitudTermino = term.length;
 
-        if(longitudTermino > 30)
+        if (longitudTermino > 30)
             throw new BadRequestException("El termino de búsqueda es demasiado largo");
-        
+
         let author: Author | null = null;
 
         //* Filtrado por MongoId
-        if(isValidObjectId(term)){
+        if (isValidObjectId(term)) {
             author = await this.authorModel.findById(term);
         }
 
         //* Filtrado por Dni
-        if(!author && !isNaN(Number(term))){
-            author = await this.authorModel.findOne({dni: Number(term)});
+        if (!author && !isNaN(Number(term))) {
+            author = await this.authorModel.findOne({ dni: Number(term) });
         }
 
-        if(!author)
+        if (!author)
             throw new NotFoundException(`El Autor con el termino de busqueda '${term}' no ha sido encontrado`);
 
         return author;
@@ -104,7 +104,16 @@ export class AuthorService {
         return `This action updates a #${id} author`;
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} author`;
+    async remove(id: string) {
+        try {
+            const { deletedCount } = await this.authorModel.deleteOne({ _id: id });
+
+            if (deletedCount === 0)
+                throw new NotFoundException(`No se encontro el autor con el id: ${id}`)
+
+        } catch (error) {
+            console.log(error);
+            throw new InternalServerErrorException("No se pudo eliminar el autor, leer logs");
+        }
     }
 }

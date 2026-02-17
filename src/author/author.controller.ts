@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
 import { AuthorService } from './author.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id.pipe';
 
 @Controller('author')
 export class AuthorController {
@@ -41,7 +42,7 @@ export class AuthorController {
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.authorService.remove(+id);
+    async remove(@Param('id', ParseMongoIdPipe) id: string) {
+        return await this.authorService.remove(id);
     }
 }
