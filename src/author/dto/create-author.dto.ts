@@ -1,4 +1,4 @@
-import { IsDate, IsDefined, IsEmail, IsInt, IsPositive, IsString, MaxLength, MinLength } from "class-validator";
+import { IsDate, IsDefined, IsEmail, IsIn, IsInt, IsPositive, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
 import { Type } from "class-transformer";
 
 
@@ -8,6 +8,12 @@ export class CreateAuthorDto {
     @MinLength(1, {message: "El campo nombre, como mínimo debe tener 1 caracter"})
     @MaxLength(150, {message: "El campo nombre debe tener como máximo 150 caracteres"})
     name: string;
+
+    @IsInt({message: "El campo dni debe ser un numero entero"})
+    @IsPositive({message: "El campo dni debe ser un numero positivo"})
+    @Min(10000000, {message: "El campo dni debe tener al menos 8 digitos"})
+    @Max(99999999, {message: "El campo dni debe tener al menos 8 digitos"})
+    dni: number;
 
     @IsEmail({}, {message: "El campo email debe ser un email válido"})
     @MinLength(1, {message: "El campo email debe tener al menos un caracter"})

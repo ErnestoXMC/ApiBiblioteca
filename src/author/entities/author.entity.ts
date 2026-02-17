@@ -5,12 +5,17 @@ import { Document } from "mongoose";
 @Schema()
 export class Author extends Document{
 
-    //* Filtraremos por nombre
+    @Prop({
+        required: true
+    })
+    name: string;
+
+    //* Filtraremos por dni
     @Prop({
         index: true,
         required: true
     })
-    name: string;
+    dni: number;
 
     @Prop({
         unique: true,
@@ -30,9 +35,7 @@ export class Author extends Document{
     })
     birthdate: Date;
 
-    //* Filtraremos por nacionalidad
     @Prop({
-        index: true,
         required: true
     })
     nationality: string;

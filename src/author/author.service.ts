@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Author } from './entities/author.entity';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
@@ -74,8 +74,30 @@ export class AuthorService {
                                         .select('-__v -createdAt -updatedAt');
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} author`;
+    async findOne(term: string) {
+
+        //* Previa a una consulta validar la longitud del termino
+        const longitudTermino = term.length;
+
+        if(longitudTermino > 30)
+            throw new BadRequestException("El termino de búsqueda es demasiado largo");
+        
+        let author: Author | null = null;
+
+        //* Filtrado por MongoId
+        if(isValidObjectId(term)){
+            author = await this.authorModel.findById(term);
+        }
+
+        //* Filtrado por Dni
+        if(!author && !isNaN(Number(term))){
+            author = await this.authorModel.findOne({dni: Number(term)});
+        }
+
+        if(!author)
+            throw new NotFoundException(`El Autor con el termino de busqueda '${term}' no ha sido encontrado`);
+
+        return author;
     }
 
     update(id: number, updateAuthorDto: UpdateAuthorDto) {

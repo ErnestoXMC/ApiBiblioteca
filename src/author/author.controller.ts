@@ -27,9 +27,9 @@ export class AuthorController {
         return await this.authorService.findAll(pagination);
     }
 
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.authorService.findOne(+id);
+    @Get(':term')
+    async findOne(@Param('term') term: string) {
+        return await this.authorService.findOne(term);
     }
 
     @Patch(':id')
