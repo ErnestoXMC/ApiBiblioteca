@@ -100,8 +100,34 @@ export class AuthorService {
         return author;
     }
 
-    update(id: number, updateAuthorDto: UpdateAuthorDto) {
-        return `This action updates a #${id} author`;
+    async update(id: string, updateAuthorDto: UpdateAuthorDto) {
+
+        try {
+
+            const author: Author | null = await this.authorModel.findById(id);
+
+            if(!author)
+                throw new NotFoundException(`El autor con el id '${id}' no ha sido encontrado`);
+
+            const camposNormalizar= ["name", "email", "nationality"];
+
+            camposNormalizar.forEach(campo => {
+                if(updateAuthorDto[campo]){
+                    updateAuthorDto[campo] = updateAuthorDto[campo].toLowerCase().trim();
+                }
+            })
+
+            await author.updateOne(updateAuthorDto);
+
+            return {...author.toJSON(), ...updateAuthorDto};
+            
+        } catch (error) {
+            //* Obtenemos la instancia de nuestro notfoundexcepcion
+            if(error instanceof NotFoundException) throw error;
+
+            console.log(error);
+            throw new BadRequestException(`No se pudo actualizar al autor con el if '${id}', leer logs`);
+        }
     }
 
     async remove(id: string) {

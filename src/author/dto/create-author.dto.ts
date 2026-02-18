@@ -1,4 +1,4 @@
-import { IsDate, IsDefined, IsEmail, IsIn, IsInt, IsPositive, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
+import { IsDate, IsEmail, IsInt, IsPositive, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
 import { Type } from "class-transformer";
 
 

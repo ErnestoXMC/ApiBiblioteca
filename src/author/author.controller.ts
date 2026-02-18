@@ -34,11 +34,11 @@ export class AuthorController {
     }
 
     @Patch(':id')
-    update(
-        @Param('id') id: string, 
+    async update(
+        @Param('id', ParseMongoIdPipe) id: string, 
         @Body() updateAuthorDto: UpdateAuthorDto
     ) {
-        return this.authorService.update(+id, updateAuthorDto);
+        return await this.authorService.update(id, updateAuthorDto);
     }
 
     @Delete(':id')
