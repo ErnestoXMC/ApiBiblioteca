@@ -17,12 +17,6 @@ export class AuthorController {
         return await this.authorService.create(createAuthorDto);
     }
 
-    //! Endpoint Para Desarrollo - Eliminar al crear un seed
-    @Post('bulk')
-    async createMany(@Body() createAuthorDto: CreateAuthorDto[]) {
-        return await this.authorService.createMany(createAuthorDto);
-    }
-
     @Get()
     async findAll(@Query() pagination: PaginationDto) {
         return await this.authorService.findAll(pagination);

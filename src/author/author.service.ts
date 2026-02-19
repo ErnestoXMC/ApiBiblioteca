@@ -33,29 +33,7 @@ export class AuthorService {
             }
         }
     }
-
-    async createMany(createAuthorDto: CreateAuthorDto[]) {
-        try {
-
-            const createAuthorDtoFilter = createAuthorDto.map(author => {
-                author.name = author.name.toLowerCase().trim();
-                author.email = author.email.toLowerCase().trim();
-                author.nationality = author.nationality.toLocaleLowerCase().trim();
-                return author;
-            });
-
-            return await this.authorModel.insertMany(createAuthorDtoFilter);
-
-        } catch (error) {
-            if (error.code === 11000) {
-                throw new BadRequestException("Error al insertar varios registros, existen elementos duplicados");
-            } else {
-                console.log(error);
-                throw new InternalServerErrorException("Error no se pudo insertar los registros en nuestra base de datos - leer logs");
-            }
-        }
-    }
-
+    
     //* Paginacion con limit, offset y isActive (visualizar activos)
     async findAll(pagination: PaginationDto) {
 
@@ -109,7 +87,7 @@ export class AuthorService {
             if(!author)
                 throw new NotFoundException(`El autor con el id '${id}' no ha sido encontrado`);
 
-            const camposNormalizar= ["name", "email", "nationality"];
+            const camposNormalizar = ["name", "email", "nationality"];
 
             camposNormalizar.forEach(campo => {
                 if(updateAuthorDto[campo]){
@@ -140,6 +118,33 @@ export class AuthorService {
         } catch (error) {
             console.log(error);
             throw new InternalServerErrorException("No se pudo eliminar el autor, leer logs");
+        }
+    }
+
+    async fillAuthorsWithSeedData(authors: CreateAuthorDto[]) {
+        try {
+
+            const camposNormalizar = ["name", "email", "nationality"];
+
+            const authorsNormalize = authors.map(author => {
+                camposNormalizar.forEach(campo => {
+                    if(author[campo]){
+                        author[campo] = author[campo].toLowerCase().trim();
+                    }
+                })
+                return author;
+            })
+
+            const authorsRegistered = await this.authorModel.insertMany(authorsNormalize);
+            return authorsRegistered;
+
+        } catch (error) {
+            if(error.code === 11000){
+                throw new BadRequestException("Elemenos duplicados al registrar varios autores por seed")
+            } else{
+                console.log(error);
+                throw new InternalServerErrorException("Error al insertar varios autores por seed - leer logs");
+            }
         }
     }
 }

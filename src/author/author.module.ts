@@ -14,6 +14,7 @@ import { Author, AuthorSchema } from './entities/author.entity';
 				schema: AuthorSchema
 			}
 		])
-	]
+	],
+	exports: [AuthorService]
 })
 export class AuthorModule { }
