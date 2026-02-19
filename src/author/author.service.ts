@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Author } from './entities/author.entity';
 import { isValidObjectId, Model } from 'mongoose';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { normalizeFields } from 'src/helpers/normalize-fields.util';
 
 @Injectable()
 export class AuthorService {
@@ -125,18 +126,13 @@ export class AuthorService {
 
     async fillAuthorsWithSeedData(authors: CreateAuthorDto[]) {
         try {
-
+            
             const camposNormalizar = ["name", "email", "nationality"];
 
-            const authorsNormalize = authors.map(author => {
-                camposNormalizar.forEach(campo => {
-                    if(author[campo]){
-                        author[campo] = author[campo].toLowerCase().trim();
-                    }
-                })
-                return author;
-            })
-
+            const authorsNormalize: CreateAuthorDto[] = authors.map(author =>
+                normalizeFields(author, camposNormalizar)
+            );
+            
             const authorsRegistered = await this.authorModel.insertMany(authorsNormalize);
             return authorsRegistered;
 

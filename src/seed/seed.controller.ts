@@ -7,9 +7,9 @@ export class SeedController {
         private readonly seedService: SeedService
     ) { }
 
-    @Get('authors')
-    executeSeedAuthors() {
-        return this.seedService.executeSeedAuthors();
+    @Get('')
+    executeSeed() {
+        return this.seedService.executeSeed();
     }
 
 }

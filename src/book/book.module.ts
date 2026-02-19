@@ -19,6 +19,7 @@ import { Author, AuthorSchema } from 'src/author/entities/author.entity';
                 schema: AuthorSchema
             }
         ])
-    ]
+    ],
+    exports: [BookService]
 })
 export class BookModule { }

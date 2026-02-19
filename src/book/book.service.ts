@@ -1,10 +1,11 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Book } from './entities/book.entity';
 import { isValidObjectId, Model } from 'mongoose';
 import { Author } from 'src/author/entities/author.entity';
+import { normalizeFields } from 'src/helpers/normalize-fields.util';
 
 @Injectable()
 export class BookService {
@@ -80,6 +81,24 @@ export class BookService {
 
             console.log(error);
             throw new InternalServerErrorException("No se pudo eliminar el libro - leer logs");
+        }
+    }
+
+    async fillBookWithSeedData(books: CreateBookDto[]){
+        try {
+
+            const camposNormalizar = ["title", "genre"];
+
+            const booksNormalize: CreateBookDto[] = books.map(book =>
+                normalizeFields(book, camposNormalizar)
+            );
+
+            const booksRegistered = await this.bookModel.insertMany(booksNormalize);
+            return booksRegistered;
+
+        } catch (error) {
+            console.log(error);
+            throw new BadRequestException("Error al insertar los libros mediante seed")
         }
     }
 }
