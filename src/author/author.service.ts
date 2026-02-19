@@ -116,6 +116,8 @@ export class AuthorService {
                 throw new NotFoundException(`No se encontro el autor con el id: ${id}`)
 
         } catch (error) {
+            if(error instanceof NotFoundException) throw error;
+
             console.log(error);
             throw new InternalServerErrorException("No se pudo eliminar el autor, leer logs");
         }

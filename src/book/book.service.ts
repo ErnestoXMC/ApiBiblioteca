@@ -68,7 +68,18 @@ export class BookService {
         return `This action updates a #${id} book`;
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} book`;
+    async remove(id: string) {
+        try {
+            const {deletedCount} = await this.bookModel.deleteOne({_id: id});
+
+            if(deletedCount === 0)
+                throw new NotFoundException(`No se encontro el libro con el id '${id}'`)
+
+        } catch (error) {
+            if(error instanceof NotFoundException) throw error;
+
+            console.log(error);
+            throw new InternalServerErrorException("No se pudo eliminar el libro - leer logs");
+        }
     }
 }

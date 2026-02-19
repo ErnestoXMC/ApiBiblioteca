@@ -32,7 +32,7 @@ export class BookController {
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.bookService.remove(+id);
+    async remove(@Param('id', ParseMongoIdPipe) id: string) {
+        return await this.bookService.remove(id);
     }
 }
