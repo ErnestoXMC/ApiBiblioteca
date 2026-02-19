@@ -2,33 +2,37 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { ParseMongoIdPipe } from 'src/common/pipes/parse-mongo-id.pipe';
 
 @Controller('book')
 export class BookController {
-  constructor(private readonly bookService: BookService) {}
 
-  @Post()
-  create(@Body() createBookDto: CreateBookDto) {
-    return this.bookService.create(createBookDto);
-  }
+    constructor(
+        private readonly bookService: BookService
+    ) { }
 
-  @Get()
-  findAll() {
-    return this.bookService.findAll();
-  }
+    @Post()
+    async create(@Body() createBookDto: CreateBookDto) {
+        return await this.bookService.create(createBookDto);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.bookService.findOne(+id);
-  }
+    @Get()
+    findAll() {
+        return this.bookService.findAll();
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.bookService.update(+id, updateBookDto);
-  }
+    @Get(':id')
+    async findOne(@Param('id', ParseMongoIdPipe) id: string) {
+        return await this.bookService.findOne(id);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.bookService.remove(+id);
-  }
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
+        return this.bookService.update(+id, updateBookDto);
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.bookService.remove(+id);
+    }
 }
