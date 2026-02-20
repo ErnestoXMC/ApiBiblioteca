@@ -6,6 +6,7 @@ import { Book } from './entities/book.entity';
 import { isValidObjectId, Model } from 'mongoose';
 import { Author } from 'src/author/entities/author.entity';
 import { normalizeFields } from 'src/helpers/normalize-fields.util';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class BookService {
@@ -25,7 +26,7 @@ export class BookService {
             //* Validamos que exista el author con el id de nuestro request
             const author: Author | null = await this.authorModel.findById(createBookDto.author);
 
-            if(!author)
+            if (!author)
                 throw new NotFoundException(`No se encontro ningun autor con el id '${createBookDto.author}'`);
 
             //* Creamos nuestro objeto y normalizamos
@@ -39,7 +40,7 @@ export class BookService {
 
         } catch (error) {
             //* Capturamos el error en caso exista de nuestro try
-            if(error instanceof NotFoundException) throw error;
+            if (error instanceof NotFoundException) throw error;
 
             console.log(error);
             throw new InternalServerErrorException("Error al registrar un libro - leer logs");
@@ -47,44 +48,86 @@ export class BookService {
 
     }
 
-    findAll() {
-        return `This action returns all book`;
+    async findAll(pagination: PaginationDto) {
+
+        const { limit = 10, offset = 0, isActive } = pagination;
+
+        let filter = {};
+
+        if (isActive === 1 || isActive === 0) {
+            filter = { isActive };
+        }
+
+        return await this.bookModel.find(filter)
+            .populate('author', 'name phone')
+            .limit(limit)
+            .skip(offset)
+            .select('-__v -createdAt -updatedAt');
     }
 
     async findOne(id: string) {
 
         let book: Book | null = null;
 
-        if(isValidObjectId(id)){
+        if (isValidObjectId(id)) {
             book = await this.bookModel.findById(id).populate('author', 'name phone');
         }
 
-        if(!book)
+        if (!book)
             throw new NotFoundException(`No se encontro el libro con el id: '${id}'`);
 
         return book;
     }
 
-    update(id: number, updateBookDto: UpdateBookDto) {
-        return `This action updates a #${id} book`;
+    async update(id: string, updateBookDto: UpdateBookDto) {
+
+        try {
+            //* Verificamos que exista el libro
+            const book: Book | null = await this.bookModel.findById({ _id: id });
+
+            if (!book)
+                throw new NotFoundException(`El libro con el id '${id}' no ha sido encontrado`);
+
+            //* Verificamos que exista el autor
+            if(updateBookDto.author && isValidObjectId(updateBookDto.author)){
+                const author: Author | null = await this.authorModel.findById({_id: updateBookDto.author});
+
+                if(!author)
+                    throw new NotFoundException(`El autor con el id: '${updateBookDto.author}' no ha sido encontrado`);
+            }
+
+            //* Normalizamos nuestros campos strins y actualizamos nuestra bd
+            const camposNormalizar: string[] = ["title", "genre"];
+            const bookNormalizado: UpdateBookDto = normalizeFields(updateBookDto, camposNormalizar);
+
+            await book.updateOne(bookNormalizado);
+
+            return {...book.toJSON(), ...bookNormalizado};
+            
+        } catch (error) {
+            if(error instanceof NotFoundException) throw error;
+
+            console.log(error);
+            throw new InternalServerErrorException(`Error no se pudo actualizar el cliente con el id '${id}' - leer logs`);
+        }
     }
 
     async remove(id: string) {
         try {
-            const {deletedCount} = await this.bookModel.deleteOne({_id: id});
+            const { deletedCount } = await this.bookModel.deleteOne({ _id: id });
 
-            if(deletedCount === 0)
+            if (deletedCount === 0)
                 throw new NotFoundException(`No se encontro el libro con el id '${id}'`)
 
         } catch (error) {
-            if(error instanceof NotFoundException) throw error;
+            if (error instanceof NotFoundException) throw error;
 
             console.log(error);
             throw new InternalServerErrorException("No se pudo eliminar el libro - leer logs");
         }
     }
 
-    async fillBookWithSeedData(books: CreateBookDto[]){
+    async fillBookWithSeedData(books: CreateBookDto[]) {
         try {
 
             const camposNormalizar = ["title", "genre"];

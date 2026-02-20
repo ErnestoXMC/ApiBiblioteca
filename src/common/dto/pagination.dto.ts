@@ -5,8 +5,7 @@ export class PaginationDto {
 
     @IsOptional()
     @IsInt({message: "El parametro limit debe ser un entero"})
-    @IsPositive({message: "El parametro limit debe ser positivo"})
-    @Min(1, {message: "El parametro limit debe ser mayor o igual a 1"})
+    @Min(0, {message: "El parametro limit debe ser mayor o igual a cero"})
     limit?: number;
 
     @IsOptional()

@@ -22,5 +22,4 @@ export class CreateBookDto {
     @MinLength(20, {message: "El campo author debe tener al menos un caracter"})
     @MaxLength(30, {message: "El campo author debe tener como máximo 30 caracteres"})
     author: string;
-
 }
