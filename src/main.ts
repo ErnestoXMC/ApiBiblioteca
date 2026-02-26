@@ -21,6 +21,6 @@ async function bootstrap() {
     //* Prefijo Global de nuestra api
     app.setGlobalPrefix('biblioteca/api')
 
-    await app.listen(process.env.PORT ?? 3000);
+    await app.listen(process.env.PORT || 3000, '0.0.0.0');
 }
 bootstrap();
