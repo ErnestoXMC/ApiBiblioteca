@@ -28,10 +28,10 @@ npm install
 docker-compose up -d
 ```
 
-## 4. Reconstruir nuestra base de datos con seed
-```bash
-http://localhost:3000/biblioteca/api/seed
-```
+## 4. Configuracion Variables de Entorno
+4.1. Clonar el archivo ```.env.template``` y renombrar su copia a ```.env```
+
+4.2. Llenar las variables de entorno definidas en el ```.env```
 
 ## 5. Compilar y Ejecutar el Proyecto
 
@@ -46,8 +46,14 @@ npm run start:dev
 npm run start:prod
 ```
 
+## 6. Reconstruir nuestra base de datos con seed
+```bash
+http://localhost:3000/biblioteca/api/seed
+```
+
+
 ## Stack Usado
 * Nest JS
 * TypeScript
-* MongoDb
+* MongoDB
 * Mongoose
