@@ -51,6 +51,13 @@ npm run start:prod
 http://localhost:3000/biblioteca/api/seed
 ```
 
+## 7. Production Build
+1. Crear el archivo ```.env.prod```
+2. Llenar las variables de entorno segun nuestro ```.env.template```
+3. Crear la nueva imagen
+```bash
+docker-compose -f docker-compose.prod.yaml --env-file .env.prod up --build
+```
 
 ## Stack Usado
 * Nest JS
