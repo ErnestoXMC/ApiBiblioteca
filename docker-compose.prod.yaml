@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  bibliotecapp:
+    depends_on:
+      - db
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: biblioteca-docker
+    container_name: bibliotecapp
+    restart: "no" # No reiniciar el contenedor si se detiene
+    ports:
+      - "${PORT}:${PORT}" # Definido en nuestro .env
+    # working_dir: /var/www/biblioteca
+    environment:
+      MONGODB: ${MONGODB} # Definido en nuestro .env
+      PORT: ${PORT} # Definido en nuestro .env
+
+  db:
+    image: mongo:5
+    container_name: mongo-biblio
+    restart: "no"
+    ports:
+      - 27017:27017
+    environment:
+      MONGODB_DATABASE: nest-biblioteca
+    volumes:
+      - ./mongo:/data/db
